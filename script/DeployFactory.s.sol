@@ -12,7 +12,7 @@ contract DeployFactory is Script {
     ///   # OPTIONAL – deploy an initial vault in same tx
     ///   export BENEFICIARY=0xYourEoa
     function run() external {
-        uint256 pk          = vm.envUint("PRIVATE_KEY");
+        uint256 pk = vm.envUint("PRIVATE_KEY");
         address beneficiary = vm.envOr("BENEFICIARY", address(0));
 
         vm.startBroadcast(pk);

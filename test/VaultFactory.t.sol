@@ -9,14 +9,14 @@ import "../src/Errors.sol";
 
 contract VaultFactoryTest is Test {
     VaultFactory factory;
-    MockERC20    token;
+    MockERC20 token;
 
     address beneficiary = address(0xBEEF);
-    address stranger    = address(0xCAFE);
+    address stranger = address(0xCAFE);
 
     function setUp() public {
         factory = new VaultFactory();
-        token   = new MockERC20();
+        token = new MockERC20();
         vm.deal(address(this), 10 ether);
     }
 

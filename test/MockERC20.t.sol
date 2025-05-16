@@ -7,7 +7,7 @@ import "./mocks/MockERC20.sol";
 
 contract MockERC20Test is Test {
     MockERC20 token;
-    address   user = address(0xBEEF);
+    address user = address(0xBEEF);
 
     function setUp() public {
         token = new MockERC20();
@@ -51,6 +51,6 @@ contract MockERC20Test is Test {
 
     function testMintPayableInsufficientValueReverts() public {
         vm.expectRevert("MockERC20: gimme more money!");
-        token.mintPayable{value: 1 wei}(user, 1e20);   // far less than amount/100
+        token.mintPayable{value: 1 wei}(user, 1e20); // far less than amount/100
     }
 }
