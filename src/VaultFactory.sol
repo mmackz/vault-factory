@@ -18,12 +18,13 @@ contract VaultFactory {
     }
 
     function createVault(address beneficiary) external returns (address vault) {
+        if (beneficiary == address(0)) revert InvalidBeneficiary();
         if (vaultOf[beneficiary] != address(0)) revert VaultExists(beneficiary);
 
         vault = implementation.clone();
+        vaultOf[beneficiary] = vault;
         Vault(payable(vault)).initialize(beneficiary);
 
-        vaultOf[beneficiary] = vault;
         emit VaultCreated(beneficiary, vault);
     }
 
