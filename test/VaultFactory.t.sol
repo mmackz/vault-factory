@@ -20,7 +20,7 @@ contract VaultFactoryTest is Test {
         vm.deal(address(this), 10 ether);
     }
 
-    /////////////
+    ////////////
     // Deploy //
     ////////////
 
@@ -42,9 +42,9 @@ contract VaultFactoryTest is Test {
         assertEq(Vault(payable(vault)).owner(), beneficiary);
     }
 
-    ///////////////
+    //////////////
     // ETH flow //
-    ///////////////
+    //////////////
 
     function testETHDepositAndReleaseByBeneficiary() public {
         address vault = factory.createVault(beneficiary);
@@ -102,7 +102,7 @@ contract VaultFactoryTest is Test {
         assertEq(token.balanceOf(beneficiary), 500e18);
     }
 
-    ///////////
+    //////////
     // Misc //
     //////////
 
@@ -157,5 +157,23 @@ contract VaultFactoryTest is Test {
     function testVaultOfReturnsCorrectAddress() public {
         address vault = factory.createVault(beneficiary);
         assertEq(factory.vaultOf(beneficiary), vault);
+    }
+
+    ////////////////////
+    // Implementation //
+    ////////////////////
+
+    /// @dev The logic-contract itself must stay locked
+    function testImplCannotInitialize() public {
+        address implAddr = factory.implementation();
+        vm.expectRevert();
+        VaultImpl(payable(implAddr)).initialize(beneficiary);
+    }
+
+    /// @dev A fresh clone must only initialize once (initializer‐guard)
+    function testCloneInitializeOnlyOnce() public {
+        address v = factory.createVault(beneficiary);
+        vm.expectRevert();
+        VaultImpl(payable(v)).initialize(beneficiary);
     }
 }
