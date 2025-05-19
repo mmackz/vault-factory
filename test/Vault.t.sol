@@ -77,4 +77,59 @@ contract VaultTest is Test {
         assertEq(vault.released(address(token)), 500e18);
         assertEq(vault.releasable(address(token)), 0);
     }
+
+    /// @dev Test releasing ETH when vault balance is zero
+    function testReleaseEthWithNoFunds() public {
+        Vault vault = Vault(payable(_vault));
+        uint256 initialBeneficiaryBalance = beneficiary.balance;
+
+        // Ensure vault has no ETH for this test
+        assertEq(address(_vault).balance, 0);
+        assertEq(vault.releasable(), 0);
+        assertEq(vault.released(), 0);
+
+        // Attempt to release ETH
+        vm.prank(beneficiary);
+        vault.release();
+
+        // Balances and vault state should remain unchanged
+        assertEq(beneficiary.balance, initialBeneficiaryBalance);
+        assertEq(vault.releasable(), 0);
+        assertEq(vault.released(), 0);
+        assertEq(address(_vault).balance, 0);
+    }
+
+    /// @dev Test releasing ERC20 when vault balance is zero for that token
+    function testReleaseERC20WithNoFunds() public {
+        Vault vault = Vault(payable(_vault));
+        MockERC20 otherToken = new MockERC20();
+        uint256 initialBeneficiaryTokenBalance = token.balanceOf(beneficiary);
+        uint256 initialBeneficiaryOtherTokenBalance = otherToken.balanceOf(beneficiary);
+
+        // Ensure vault has no specific tokens for this test
+        assertEq(token.balanceOf(_vault), 0);
+        assertEq(otherToken.balanceOf(_vault), 0);
+        assertEq(vault.releasable(address(token)), 0);
+        assertEq(vault.released(address(token)), 0);
+        assertEq(vault.releasable(address(otherToken)), 0);
+        assertEq(vault.released(address(otherToken)), 0);
+
+        // Attempt to release MOCK token
+        vm.prank(beneficiary);
+        vault.release(address(token));
+
+        // Attempt to release otherToken
+        vm.prank(beneficiary);
+        vault.release(address(otherToken));
+
+        // Balances and vault state should remain unchanged
+        assertEq(token.balanceOf(beneficiary), initialBeneficiaryTokenBalance);
+        assertEq(vault.releasable(address(token)), 0);
+        assertEq(vault.released(address(token)), 0);
+        assertEq(token.balanceOf(_vault), 0);
+        assertEq(otherToken.balanceOf(beneficiary), initialBeneficiaryOtherTokenBalance);
+        assertEq(vault.releasable(address(otherToken)), 0);
+        assertEq(vault.released(address(otherToken)), 0);
+        assertEq(otherToken.balanceOf(_vault), 0);
+    }
 }
