@@ -42,6 +42,11 @@ contract VaultFactoryTest is Test {
         assertEq(Vault(payable(vault)).owner(), beneficiary);
     }
 
+    function testCreateVaultRevertsForZeroAddressBeneficiary() public {
+        vm.expectRevert(InvalidBeneficiary.selector);
+        factory.createVault(address(0));
+    }
+
     //////////////
     // ETH flow //
     //////////////
