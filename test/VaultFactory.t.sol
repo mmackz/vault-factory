@@ -167,13 +167,13 @@ contract VaultFactoryTest is Test {
     function testImplCannotInitialize() public {
         address implAddr = factory.implementation();
         vm.expectRevert();
-        VaultImpl(payable(implAddr)).initialize(beneficiary);
+        Vault(payable(implAddr)).initialize(beneficiary);
     }
 
     /// @dev A fresh clone must only initialize once (initializer‐guard)
     function testCloneInitializeOnlyOnce() public {
-        address v = factory.createVault(beneficiary);
+        address vault = factory.createVault(beneficiary);
         vm.expectRevert();
-        VaultImpl(payable(v)).initialize(beneficiary);
+        Vault(payable(vault)).initialize(beneficiary);
     }
 }

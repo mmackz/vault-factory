@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
-import "./VaultImpl.sol";
+import "./Vault.sol";
 import "./Errors.sol";
 
 contract VaultFactory {
@@ -14,14 +14,14 @@ contract VaultFactory {
     event VaultCreated(address indexed beneficiary, address vault);
 
     constructor() {
-        implementation = address(new VaultImpl());
+        implementation = address(new Vault());
     }
 
     function createVault(address beneficiary) external returns (address vault) {
         if (vaultOf[beneficiary] != address(0)) revert VaultExists(beneficiary);
 
         vault = implementation.clone();
-        VaultImpl(payable(vault)).initialize(beneficiary);
+        Vault(payable(vault)).initialize(beneficiary);
 
         vaultOf[beneficiary] = vault;
         emit VaultCreated(beneficiary, vault);
