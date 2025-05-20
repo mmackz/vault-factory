@@ -181,4 +181,66 @@ contract VaultFactoryTest is Test {
         vm.expectRevert();
         Vault(payable(vault)).initialize(beneficiary);
     }
+
+    /////////////////////////////////
+    // Deterministic Address Tests //
+    /////////////////////////////////
+
+    function testDeterministicAddressUniqueness() public {
+        address beneficiary1 = address(0xBEEF);
+        address beneficiary2 = address(0xFACE);
+
+        address vault1 = factory.createVault(beneficiary1);
+        address vault2 = factory.createVault(beneficiary2);
+
+        assertEq(factory.getVault(beneficiary1), vault1);
+        assertEq(factory.getVault(beneficiary2), vault2);
+        assertNotEq(vault1, vault2);
+    }
+
+    function testDeterministicAddressMatchesComputedCreate2Address() public {
+        address implementation = factory.implementation();
+        address benefactor = address(0x865C301c46d64DE5c9B124Ec1a97eF1EFC1bcbd1);
+
+        bytes32 salt = keccak256(abi.encodePacked(benefactor));
+
+        // The proxy creation code for Clones.cloneDeterministic is:
+        // 0x3d602d80600a3d3981f3363d3d373d3d3d363d73[IMPLEMENTATION_ADDRESS]5af43d82803e903d91602b57fd5bf3
+        // Where [IMPLEMENTATION_ADDRESS] is the 20-byte address of the implementation contract.
+        bytes memory proxyBytecode = abi.encodePacked(
+            bytes10(0x3d602d80600a3d3981f3),
+            bytes10(0x363d3d373d3d3d363d73),
+            implementation,
+            bytes15(0x5af43d82803e903d91602b57fd5bf3)
+        );
+        bytes32 proxyBytecodeHash = keccak256(proxyBytecode);
+
+        address expectedVaultAddress = vm.computeCreate2Address(salt, proxyBytecodeHash, address(factory));
+
+        address actualVaultAddress = factory.createVault(benefactor);
+
+        console.log("factory", address(factory));
+        console.log("implementation", implementation);
+        console.log("benefactor", benefactor);
+        console.log("actualVaultAddress", actualVaultAddress);
+        console.log("expectedVaultAddress", expectedVaultAddress);
+
+        assertEq(actualVaultAddress, expectedVaultAddress);
+        assertEq(factory.getVault(benefactor), expectedVaultAddress);
+    }
+
+    function testDeterministicAddressSaltUniqueness() public {
+        address beneficiary1 = address(0x1111);
+        address beneficiary2 = address(0x2222);
+
+        bytes32 salt1 = keccak256(abi.encodePacked(beneficiary1));
+        bytes32 salt2 = keccak256(abi.encodePacked(beneficiary2));
+
+        assertNotEq(salt1, salt2);
+
+        // Create vaults to ensure different salts lead to different addresses
+        address vault1 = factory.createVault(beneficiary1);
+        address vault2 = factory.createVault(beneficiary2);
+        assertNotEq(vault1, vault2);
+    }
 }
