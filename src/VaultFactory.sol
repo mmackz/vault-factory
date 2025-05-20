@@ -21,7 +21,8 @@ contract VaultFactory {
         if (beneficiary == address(0)) revert InvalidBeneficiary();
         if (vaultOf[beneficiary] != address(0)) revert VaultExists(beneficiary);
 
-        vault = implementation.clone();
+        bytes32 salt = keccak256(abi.encodePacked(beneficiary));
+        vault = implementation.cloneDeterministic(salt);
         vaultOf[beneficiary] = vault;
         Vault(payable(vault)).initialize(beneficiary);
 
