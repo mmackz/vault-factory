@@ -36,10 +36,10 @@ contract VaultFactory {
     /**
      * @notice Creates a vault for the beneficiary at the predetermined address
      * @dev Uses CREATE2 through cloneDeterministic for deterministic addresses
+     *      Reverts with InvalidBeneficiary if beneficiary is the zero address
+     *      Reverts with VaultExists if a vault already exists for this beneficiary
      * @param beneficiary The address that will own the vault (cannot be zero address)
      * @return vault The address of the newly created vault
-     * @custom:throws InvalidBeneficiary if beneficiary is the zero address
-     * @custom:throws VaultExists if a vault already exists for this beneficiary
      */
     function createVault(address beneficiary) external returns (address vault) {
         if (beneficiary == address(0)) revert InvalidBeneficiary();
