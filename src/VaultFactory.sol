@@ -66,10 +66,12 @@ contract VaultFactory {
     /**
      * @notice Gets the predetermined address for a beneficiary whether they have deployed a vault there or not
      * @dev Uses predictDeterministicAddress to calculate the address that would be used by createVault()
-     * @param beneficiary The address to get the vault address for
+     *      Reverts with InvalidBeneficiary if beneficiary is the zero address
+     * @param beneficiary The address to get the vault address for (cannot be zero address)
      * @return vault The predetermined address where the vault would be (or is) deployed
      */
     function getVaultAddress(address beneficiary) external view returns (address vault) {
+        if (beneficiary == address(0)) revert InvalidBeneficiary();
         bytes32 salt = keccak256(abi.encodePacked(beneficiary));
         return implementation.predictDeterministicAddress(salt);
     }
