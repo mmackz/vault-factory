@@ -208,12 +208,6 @@ contract VaultFactoryTest is Test {
 
         address actualVaultAddress = factory.createVault(benefactor);
 
-        console.log("factory", address(factory));
-        console.log("implementation", implementation);
-        console.log("benefactor", benefactor);
-        console.log("actualVaultAddress", actualVaultAddress);
-        console.log("expectedVaultAddress", expectedVaultAddress);
-
         assertEq(actualVaultAddress, expectedVaultAddress);
         assertEq(factory.deployedVault(benefactor), expectedVaultAddress);
     }
