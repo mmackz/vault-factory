@@ -26,8 +26,8 @@ contract VaultFactoryTest is Test {
 
     function testCreateVault() public {
         address vault = factory.createVault(beneficiary);
-        assertEq(factory.vaultOf(beneficiary), vault);
-        assertTrue(factory.hasVault(beneficiary));
+        assertEq(factory.deployedVault(beneficiary), vault);
+        assertTrue(factory.hasDeployedVault(beneficiary));
         assertEq(Vault(payable(vault)).owner(), beneficiary);
     }
 
@@ -133,35 +133,24 @@ contract VaultFactoryTest is Test {
     // Helpers //
     /////////////
 
-    //--- hasVault ---//
-    function testHasVaultFalseBeforeCreate() public view {
-        assertFalse(factory.hasVault(beneficiary));
+    //--- hasDeployedVault ---//
+    function testHasDeployedVaultFalseBeforeCreate() public view {
+        assertFalse(factory.hasDeployedVault(beneficiary));
     }
 
-    function testHasVaultTrueAfterCreate() public {
+    function testHasDeployedVaultTrueAfterCreate() public {
         factory.createVault(beneficiary);
-        assertTrue(factory.hasVault(beneficiary));
+        assertTrue(factory.hasDeployedVault(beneficiary));
     }
 
-    //--- getVault ---//
-    function testGetVaultRevertsWhenNone() public {
-        vm.expectRevert(abi.encodeWithSelector(NoVaultExists.selector, beneficiary));
-        factory.getVault(beneficiary);
+    //--- deployedVault ---//
+    function testDeployedVaultZeroAddressWhenNone() public view {
+        assertEq(factory.deployedVault(beneficiary), address(0));
     }
 
-    function testGetVaultReturnsCorrectAddress() public {
+    function testDeployedVaultReturnsCorrectAddress() public {
         address vault = factory.createVault(beneficiary);
-        assertEq(factory.getVault(beneficiary), vault);
-    }
-
-    //--- vaultOf ---//
-    function testVaultOfZeroAddressWhenNone() public view {
-        assertEq(factory.vaultOf(beneficiary), address(0));
-    }
-
-    function testVaultOfReturnsCorrectAddress() public {
-        address vault = factory.createVault(beneficiary);
-        assertEq(factory.vaultOf(beneficiary), vault);
+        assertEq(factory.deployedVault(beneficiary), vault);
     }
 
     ////////////////////
@@ -193,8 +182,8 @@ contract VaultFactoryTest is Test {
         address vault1 = factory.createVault(beneficiary1);
         address vault2 = factory.createVault(beneficiary2);
 
-        assertEq(factory.getVault(beneficiary1), vault1);
-        assertEq(factory.getVault(beneficiary2), vault2);
+        assertEq(factory.deployedVault(beneficiary1), vault1);
+        assertEq(factory.deployedVault(beneficiary2), vault2);
         assertNotEq(vault1, vault2);
     }
 
@@ -226,7 +215,7 @@ contract VaultFactoryTest is Test {
         console.log("expectedVaultAddress", expectedVaultAddress);
 
         assertEq(actualVaultAddress, expectedVaultAddress);
-        assertEq(factory.getVault(benefactor), expectedVaultAddress);
+        assertEq(factory.deployedVault(benefactor), expectedVaultAddress);
     }
 
     function testDeterministicAddressSaltUniqueness() public {
