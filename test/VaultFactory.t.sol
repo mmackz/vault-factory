@@ -153,6 +153,54 @@ contract VaultFactoryTest is Test {
         assertEq(factory.deployedVault(beneficiary), vault);
     }
 
+    //--- getVaultAddress ---//
+    function testGetVaultAddressBeforeDeployment() public view {
+        address predictedAddress = factory.getVaultAddress(beneficiary);
+        assertNotEq(predictedAddress, address(0));
+    }
+
+    function testGetVaultAddressAfterDeployment() public {
+        address predictedAddress = factory.getVaultAddress(beneficiary);
+        address vault = factory.createVault(beneficiary);
+        address addressAfterDeployment = factory.getVaultAddress(beneficiary);
+        
+        assertEq(predictedAddress, vault);
+        assertEq(addressAfterDeployment, vault);
+        assertEq(predictedAddress, addressAfterDeployment);
+    }
+
+    function testGetVaultAddressMatchesDeployedAddress() public {
+        address predictedAddress = factory.getVaultAddress(beneficiary);
+        address deployedVault = factory.createVault(beneficiary);
+        
+        assertEq(predictedAddress, deployedVault);
+        assertEq(factory.deployedVault(beneficiary), predictedAddress);
+    }
+
+    function testGetVaultAddressDifferentBeneficiaries() public view {
+        address beneficiary1 = address(0xBEEF);
+        address beneficiary2 = address(0xFACE);
+        
+        address vaultAddress1 = factory.getVaultAddress(beneficiary1);
+        address vaultAddress2 = factory.getVaultAddress(beneficiary2);
+        
+        assertNotEq(vaultAddress1, vaultAddress2);
+        assertNotEq(vaultAddress1, address(0));
+        assertNotEq(vaultAddress2, address(0));
+    }
+
+    function testGetVaultAddressConsistent() public view {
+        address firstCall = factory.getVaultAddress(beneficiary);
+        address secondCall = factory.getVaultAddress(beneficiary);
+        
+        assertEq(firstCall, secondCall);
+    }
+
+    function testGetVaultAddressRevertsForZeroAddress() public {
+        vm.expectRevert(InvalidBeneficiary.selector);
+        factory.getVaultAddress(address(0));
+    }
+
     ////////////////////
     // Implementation //
     ////////////////////
