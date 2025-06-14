@@ -15,7 +15,7 @@ contract VaultFactory {
 
     /// @notice The implementation contract address used for all vault clones
     address public immutable implementation;
-    
+
     /// @notice Mapping of beneficiary addresses to their deployed vault addresses
     /// @dev Only contains entries for deployed vaults
     mapping(address => address) public deployedVault;

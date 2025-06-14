@@ -163,7 +163,7 @@ contract VaultFactoryTest is Test {
         address predictedAddress = factory.getVaultAddress(beneficiary);
         address vault = factory.createVault(beneficiary);
         address addressAfterDeployment = factory.getVaultAddress(beneficiary);
-        
+
         assertEq(predictedAddress, vault);
         assertEq(addressAfterDeployment, vault);
         assertEq(predictedAddress, addressAfterDeployment);
@@ -172,7 +172,7 @@ contract VaultFactoryTest is Test {
     function testGetVaultAddressMatchesDeployedAddress() public {
         address predictedAddress = factory.getVaultAddress(beneficiary);
         address deployedVault = factory.createVault(beneficiary);
-        
+
         assertEq(predictedAddress, deployedVault);
         assertEq(factory.deployedVault(beneficiary), predictedAddress);
     }
@@ -180,10 +180,10 @@ contract VaultFactoryTest is Test {
     function testGetVaultAddressDifferentBeneficiaries() public view {
         address beneficiary1 = address(0xBEEF);
         address beneficiary2 = address(0xFACE);
-        
+
         address vaultAddress1 = factory.getVaultAddress(beneficiary1);
         address vaultAddress2 = factory.getVaultAddress(beneficiary2);
-        
+
         assertNotEq(vaultAddress1, vaultAddress2);
         assertNotEq(vaultAddress1, address(0));
         assertNotEq(vaultAddress2, address(0));
@@ -192,7 +192,7 @@ contract VaultFactoryTest is Test {
     function testGetVaultAddressConsistent() public view {
         address firstCall = factory.getVaultAddress(beneficiary);
         address secondCall = factory.getVaultAddress(beneficiary);
-        
+
         assertEq(firstCall, secondCall);
     }
 
