@@ -2,6 +2,21 @@
 
 ## Overview
 
+> **System Architecture:**
+
+```mermaid
+graph TD
+  A["VaultFactory"] -- "Clones (CREATE2)" --> B["Vault (proxy)"]
+  B -- "Beneficiary (immutable)" --> C["User Address"]
+  B -.-> D["ETH/ERC20 Deposits"]
+  D -.-> B
+  C -- "Withdraw (release)" --> B
+  subgraph "Key Properties"
+    Bdesc["• Based on VestingWallet (OZ)\n• No vesting: duration=0\n• Non-transferable\n• Only 1 vault per user"]
+  end
+  style Bdesc fill:#f9f,stroke:#333,stroke-width:1px
+```
+
 Vault-Factory is a Solidity project that provides a factory for deploying simple, soulbound vault contracts. Each vault is a modified version of OpenZeppelin's `VestingWallet.sol`, with the vesting logic effectively removed by setting the duration to zero and the start time to the deployment block. This turns them into basic vaults from which funds (ETH or ERC20 tokens) can be withdrawn at any time by the beneficiary.
 
 A key feature is that the ownership transfer and renouncement functions in the vaults are disabled, making each vault permanently tied (soulbound) to its beneficiary's address. The factory ensures that only one vault can be created per beneficiary address.
